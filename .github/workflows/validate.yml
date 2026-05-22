@@ -22,7 +22,7 @@ jobs:
     name: hassfest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Hassfest validation
         uses: home-assistant/actions/hassfest@master
 
@@ -30,7 +30,7 @@ jobs:
     name: HACS
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: HACS Action
         uses: hacs/action@main
         with:
