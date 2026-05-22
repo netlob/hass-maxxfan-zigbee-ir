@@ -1,0 +1,37 @@
+# Validates the repo against HACS + hassfest rules.
+#
+# hassfest is Home Assistant's own integration validator — it checks
+# manifest.json, services.yaml, strings.json, translation completeness,
+# config_flow correctness, etc.  Running it on every PR catches drift early.
+#
+# hacs/action checks the HACS-side metadata (hacs.json, repo structure,
+# release tagging conventions, optional brands lookup).
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly catch for upstream rule changes in hassfest / HACS without our
+    # repo changing.  3 AM UTC Monday avoids weekday CI traffic.
+    - cron: "0 3 * * 1"
+
+jobs:
+  hassfest:
+    name: hassfest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Hassfest validation
+        uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    name: HACS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: HACS Action
+        uses: hacs/action@main
+        with:
+          category: integration

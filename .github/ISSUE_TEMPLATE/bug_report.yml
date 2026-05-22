@@ -1,0 +1,68 @@
+name: Bug report
+description: Something doesn't work — wrong state, missed IR, exception in the log.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug. The more concrete you can be —
+        especially with Home Assistant + integration versions, the IR blaster
+        model, and a slice of the HA log around the failure — the faster this
+        gets resolved.
+
+  - type: input
+    id: ha-version
+    attributes:
+      label: Home Assistant version
+      placeholder: "e.g. 2026.3.1"
+    validations:
+      required: true
+
+  - type: input
+    id: integration-version
+    attributes:
+      label: Integration version
+      description: From HACS or the manifest.json `version` field.
+      placeholder: "e.g. 0.2.0"
+    validations:
+      required: true
+
+  - type: input
+    id: blaster
+    attributes:
+      label: IR blaster model
+      description: Z2M model / vendor — e.g. Moes UFO-R11, HSENO TS1201.
+      placeholder: "e.g. Moes UFO-R11 (TS1201 / _TZ3290_yyax9ajf)"
+    validations:
+      required: true
+
+  - type: input
+    id: maxxfan-model
+    attributes:
+      label: MaxxFan model
+      placeholder: "e.g. MaxxFan Deluxe 5100K (smoke dome)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, what actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log lines
+      description: |
+        Filter HA's log for `maxxfan` (Settings → System → Logs → search), and
+        paste the lines around the failure. Z2M logs help too if the IR didn't
+        leave the blaster.
+      render: shell
+
+  - type: textarea
+    id: anything-else
+    attributes:
+      label: Anything else?

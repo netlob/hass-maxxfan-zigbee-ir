@@ -1,0 +1,10 @@
+# Test/dev dependencies — installed in CI and by `pip install -e ".[test]"`.
+# Pinned to broad ranges; refresh via Dependabot.
+pytest>=8
+pytest-asyncio>=0.24
+pytest-cov>=5
+
+# Brings the matching Home Assistant version + its test helpers as a single
+# coherent set.  Each release of this package tracks a specific HA version
+# (see https://github.com/MatthewFlamm/pytest-homeassistant-custom-component).
+pytest-homeassistant-custom-component>=0.13

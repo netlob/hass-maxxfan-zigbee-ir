@@ -1,0 +1,151 @@
+# pyproject.toml — tooling config only.  The integration itself is loaded by
+# Home Assistant from `custom_components/maxxfan/manifest.json`, not from
+# this file.  We use pyproject purely to centralise ruff / mypy / pytest
+# config and to declare dev/test dependencies for local + CI runs.
+
+[project]
+name = "hass-maxxfan-zigbee-ir"
+version = "0.1.0"
+description = "Home Assistant custom integration controlling MAXXAIR MaxxFan Deluxe roof fans via a Tuya-class Zigbee IR-blaster paired in Zigbee2MQTT."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Sjoerd Bolten", email = "sjoerdabolten@gmail.com" }]
+requires-python = ">=3.13"
+keywords = [
+  "home-assistant",
+  "hacs",
+  "homeassistant",
+  "maxxfan",
+  "maxxair",
+  "zigbee",
+  "zigbee2mqtt",
+  "tuya",
+  "ir-blaster",
+  "camper",
+  "rv",
+  "climate",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Framework :: Home Assistant",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Home Automation",
+]
+
+[project.urls]
+Homepage = "https://github.com/netlob/hass-maxxfan-zigbee-ir"
+Documentation = "https://github.com/netlob/hass-maxxfan-zigbee-ir#readme"
+Repository = "https://github.com/netlob/hass-maxxfan-zigbee-ir"
+Issues = "https://github.com/netlob/hass-maxxfan-zigbee-ir/issues"
+Changelog = "https://github.com/netlob/hass-maxxfan-zigbee-ir/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8",
+  "pytest-asyncio>=0.24",
+  "pytest-cov>=5",
+  "pytest-homeassistant-custom-component>=0.13",
+]
+
+# ─── ruff ───────────────────────────────────────────────────────────────────
+# Modern Python linter + formatter.  Mirrors core Home Assistant's choices
+# where reasonable, with a slightly wider line length for readability.
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["custom_components", "tests"]
+
+[tool.ruff.lint]
+# Curated rule set — selective rather than "all".  Each family has a comment
+# explaining why it's on.
+select = [
+  "E",     # pycodestyle errors
+  "W",     # pycodestyle warnings
+  "F",     # pyflakes (undefined names, unused imports)
+  "I",     # isort (import ordering)
+  "B",     # flake8-bugbear (likely bugs)
+  "UP",    # pyupgrade (modernise syntax for our py version)
+  "ASYNC", # flake8-async (asyncio pitfalls)
+  "S",     # flake8-bandit (security)
+  "C4",    # flake8-comprehensions
+  "SIM",   # flake8-simplify
+  "PT",    # flake8-pytest-style
+  "RET",   # flake8-return
+  "PIE",   # flake8-pie
+  "TID",   # tidy-imports
+  "PL",    # pylint (subset)
+  "RUF",   # ruff-specific rules
+  "D",     # pydocstyle (docstrings) — relaxed below
+]
+ignore = [
+  "D203",   # 1 blank line required before class docstring (conflicts with D211)
+  "D213",   # multi-line docstring summary should start at the second line (conflicts with D212)
+  "PLR0913", # too many arguments (HA entities often have many)
+  "S101",   # asserts allowed (used in tests + protocol invariants)
+  "PLR2004", # magic value comparison (the IR protocol IS magic values)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+  "D",      # tests don't need docstrings
+  "S101",   # asserts are the whole point in tests
+  "PLR2004", # magic values are fine in test fixtures
+]
+"__init__.py" = ["D104"] # missing docstring in public package (we use module docstring instead)
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+# ─── mypy ───────────────────────────────────────────────────────────────────
+# Strict on the pure-Python protocol layer; permissive on HA-coupled code
+# because HA's own type stubs aren't perfect and we don't want false-positive
+# friction in PRs.
+
+[tool.mypy]
+python_version = "3.13"
+strict = false
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+show_error_codes = true
+files = ["custom_components"]
+
+[[tool.mypy.overrides]]
+module = "custom_components.maxxfan.protocol.*"
+strict = true
+disallow_untyped_defs = true
+disallow_any_unimported = true
+
+# ─── pytest ─────────────────────────────────────────────────────────────────
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --strict-markers --strict-config"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["custom_components/maxxfan"]
+branch = true
+omit = [
+  "*/translations/*",
+  "*/strings.json",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "raise NotImplementedError",
+  "if TYPE_CHECKING:",
+  "^\\s*\\.\\.\\.\\s*$",
+]
+show_missing = true
+skip_covered = false
+fail_under = 85
+
+# Protocol modules carry their own coverage gate (95%) — enforced separately
+# in the CI workflow rather than in pyproject because coverage.py doesn't
+# support per-module thresholds natively.

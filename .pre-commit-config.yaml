@@ -1,0 +1,35 @@
+# pre-commit hooks — run with `pre-commit install` once after cloning.
+# The same checks run in CI; pre-commit just shortens the feedback loop.
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - homeassistant>=2025.1
+          - voluptuous
+        # mypy in pre-commit is slower than in CI because each invocation
+        # rebuilds its cache.  Worth it for catching type errors before
+        # they reach the PR.
+        files: ^custom_components/maxxfan/
