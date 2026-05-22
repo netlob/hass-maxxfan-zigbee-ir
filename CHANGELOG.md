@@ -12,5 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial repo scaffold: licence, pyproject + ruff/mypy/pytest config,
   GitHub Actions for hassfest + HACS validation + lint/test matrix,
   issue templates, dependabot, pre-commit hooks, integration manifest stub.
+- Protocol layer (`custom_components/maxxfan/protocol/`): pure-Python
+  MaxxFan IR packet encoder ported from
+  [brown-studios/esphome-maxxfan-protocol](https://github.com/brown-studios/esphome-maxxfan-protocol),
+  vendored Tuya base64 codec from
+  [burkminipup/irdb-to-tuya](https://github.com/burkminipup/irdb-to-tuya),
+  `MaxxfanState` dataclass with field validation, factory helpers
+  (`intake_state`, `exhaust_state`, `ceiling_state`),
+  `CANONICAL_STATES` catalogue of 32 named states, and a
+  `build_tuya_code()` convenience wrapper.
+- 314 unit tests, 98.5 % coverage on the protocol layer.
 
 [Unreleased]: https://github.com/netlob/hass-maxxfan-zigbee-ir/compare/HEAD...HEAD

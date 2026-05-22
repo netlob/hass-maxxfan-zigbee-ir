@@ -4,24 +4,32 @@ Drives a MAXXAIR MaxxFan Deluxe roof fan from Home Assistant by sending
 fully-formed IR packets to a Tuya-class Zigbee IR-blaster (TS1201 family,
 e.g. Moes UFO-R11, HSENO) paired in Zigbee2MQTT.
 
-This package's `__init__.py` is intentionally minimal — it wires the config
-entry to the platforms.  Real logic lives in:
+Real logic lives in:
 
-* `protocol/` — pure-Python MaxxFan packet encoder + Tuya base64 IR codec.
-  No HA imports.  Unit-tested in isolation.
-* `climate.py` — the user-facing `climate.maxxfan` entity.
-* `coordinator.py` — optional cooling-thermostat loop (engaged when the user
-  picks an indoor temperature sensor in options).
-* `config_flow.py` — UI-driven setup.
+* ``protocol/`` — pure-Python MaxxFan packet encoder + Tuya base64 IR
+  codec.  No HA imports.  Unit-tested in isolation, which is why this
+  package's ``__init__`` keeps its imports deferred — running
+  ``import custom_components.maxxfan.protocol`` from a plain Python env
+  (no HA installed) must succeed.
+* ``climate.py`` — the user-facing ``climate.maxxfan`` entity (commit 3).
+* ``coordinator.py`` — optional cooling-thermostat loop (commit 4).
+* ``config_flow.py`` — UI-driven setup (commit 3).
 
-The integration shape will fill in over commits 2–4.  This scaffold passes
-hassfest + HACS validation against an empty placeholder.
+This stub passes hassfest + HACS validation against the scaffold; commit 3
+fills in ``async_setup_entry`` and wires the platforms.
 """
 
 from __future__ import annotations
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Type-only imports — never trigger an actual ``homeassistant`` import at
+    # module-load time, which keeps the protocol submodule importable from
+    # plain Python environments without HA installed (the test runner does
+    # this).
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.typing import ConfigType
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
